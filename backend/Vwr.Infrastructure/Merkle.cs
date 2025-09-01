@@ -11,13 +11,6 @@ public static class Merkle
 {
     static readonly Sha3Keccack Keccak = Sha3Keccack.Current;
 
-    public static byte[] KeccakPlaceHolder(byte[] input)
-    {
-        // Placeholder for Keccak-256 hashing. Use SHA256 as a substitute. In production, replace with a proper Keccak-256 implementation.
-        using var sha = SHA256.Create();
-        return sha.ComputeHash(input);
-    }
-
     static BigInteger BytesToBig(byte[] x) => new BigInteger(new byte[] { 0 }.Concat(x).Reverse().ToArray());
 
     static byte[] HashPair(byte[] a, byte[] b)
