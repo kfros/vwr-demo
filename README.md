@@ -34,3 +34,45 @@ Clone the repo:
 ```bash
 git clone https://github.com/kfros/vwr-demo.git
 cd vwr-demo
+```
+**## 🧪 Run locally with Docker**
+
+> Requirements: Docker Desktop (WSL2 on Windows recommended)
+
+1) Copy `.env.example` to `.env` (or create `.env` as below) and **leave `EVM__CONTRACTADDRESS` empty** for now:
+```bash
+POSTGRES_DB=vwr
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+ConnectionStrings__pg=Host=db;Port=5432;Database=vwr;Username=postgres;Password=postgres
+CORS__AllowedOrigins=http://localhost:5173,http://localhost:8080
+EVM__RPCURL=http://hardhat:8545
+EVM__PRIVATEKEY=0x59c6995e998f97a5a0044976f6e79df4f5b1b6f4ff88e84aa2c9a2e2937c5fdc
+# EVM__CONTRACTADDRESS= (fill after deploy)
+```
+2)Start the stack:
+```bash
+docker compose up -d
+
+
+Get the deployed contract address from deploy logs:
+
+docker logs vwr-deploy | grep "deployed to"
+# ✅ AttestationRegistry deployed to: 0xABCDEF...
+
+
+Put it into .env:
+
+EVM__CONTRACTADDRESS=0xABCDEF...
+
+
+Recreate the API container so it picks up the address:
+
+docker compose up -d --build api
+
+
+Open:
+
+API (Swagger): http://localhost:7020/swagger
+
+Web UI: http://localhost:8080
