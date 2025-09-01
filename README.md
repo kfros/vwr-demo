@@ -6,6 +6,13 @@
 - ✅ **Merkle**: store events, compute Merkle roots, and prepare receipts  
 - ✅ **Web3**: publish receipts into a deployed Solidity contract via Hardhat + Ethers  
 - ✅ **UI**: React + Tailwind frontend to view events, simulate webhooks, and interact with the blockchain  
+<img width="1239" height="779" alt="image" src="https://github.com/user-attachments/assets/0e53c5dc-88f5-4984-9f70-4bd81e426d3c" />
+<img width="1298" height="1520" alt="image" src="https://github.com/user-attachments/assets/362d89ff-ad6c-4d73-b292-32183a918091" />
+<img width="1300" height="914" alt="image" src="https://github.com/user-attachments/assets/eec78f29-64e8-4601-b85b-0557c6b20e2a" />
+<img width="1220" height="734" alt="image" src="https://github.com/user-attachments/assets/5ebc8ef2-0040-4b42-b29f-8363d931d06d" />
+
+
+
 
 ---
 
@@ -35,7 +42,7 @@ Clone the repo:
 git clone https://github.com/kfros/vwr-demo.git
 cd vwr-demo
 ```
-**## 🧪 Run locally with Docker**
+## 🧪 Run locally with Docker
 
 > Requirements: Docker Desktop (WSL2 on Windows recommended)
 
@@ -50,29 +57,30 @@ EVM__RPCURL=http://hardhat:8545
 EVM__PRIVATEKEY=0x59c6995e998f97a5a0044976f6e79df4f5b1b6f4ff88e84aa2c9a2e2937c5fdc
 # EVM__CONTRACTADDRESS= (fill after deploy)
 ```
-2)Start the stack:
+2) Start the stack:
 ```bash
 docker compose up -d
+```
 
+3) Get the deployed contract address from deploy logs:
 
-Get the deployed contract address from deploy logs:
-
+```bash
 docker logs vwr-deploy | grep "deployed to"
-# ✅ AttestationRegistry deployed to: 0xABCDEF...
+✅ AttestationRegistry deployed to: 0xABCDEF...
+```
 
-
-Put it into .env:
-
+4) Put it into .env:
+```bash
 EVM__CONTRACTADDRESS=0xABCDEF...
+```
 
-
-Recreate the API container so it picks up the address:
-
+5) Recreate the API container so it picks up the address:
+```bash
 docker compose up -d --build api
+```
 
-
-Open:
-
+6) Open:
+```bash
 API (Swagger): http://localhost:7020/swagger
-
 Web UI: http://localhost:8080
+```
