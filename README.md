@@ -1,58 +1,36 @@
-# Sample Hardhat 3 Beta Project (`mocha` and `ethers`)
+# VWR – Webhook → Merkle → On-chain Demo 🚀
 
-This project showcases a Hardhat 3 Beta project using `mocha` for tests and the `ethers` library for Ethereum interactions.
+**Webhook → Merkle → On-chain (VWR)** is a full-stack demo showing how traditional Web2 events (webhooks) can be verified, aggregated, and published into a smart contract on Ethereum.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+- ✅ **Web2**: receive arbitrary webhooks via REST API (.NET 8 + PostgreSQL)  
+- ✅ **Merkle**: store events, compute Merkle roots, and prepare receipts  
+- ✅ **Web3**: publish receipts into a deployed Solidity contract via Hardhat + Ethers  
+- ✅ **UI**: React + Tailwind frontend to view events, simulate webhooks, and interact with the blockchain  
 
-## Project Overview
+---
 
-This example project includes:
+## ✨ Features
+- 🌐 **Webhook ingestion** (`/api/webhooks/in/{source}`) – send events from GitHub, Slack, Jira, or demo payloads  
+- 📦 **Event storage** – PostgreSQL + EF Core migrations  
+- 🌳 **Merkle proof** – events can be bundled into Merkle roots for receipts  
+- ⛓ **On-chain publishing** – AttestationRegistry contract deployed locally via Hardhat  
+- 🖥 **Frontend** – React + Vite + TanStack Router + Wagmi wallet connect  
+- 🔥 **Out-of-the-box** – Docker Compose spins up the backend and database  
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using `mocha` and ethers.js
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+---
 
-## Usage
+## 🛠 Stack
+- **Backend**: ASP.NET Core 8, Entity Framework Core, Nethereum  
+- **Frontend**: React 18 (Vite, TypeScript, Tailwind, Wagmi, TanStack Router)  
+- **Blockchain**: Solidity, Hardhat, Ethers.js  
+- **Database**: PostgreSQL 16  
+- **DevOps**: Docker Compose, Node.js 22+, NVM, PowerShell/WSL2  
 
-### Running Tests
+---
 
-To run all the tests in the project, execute the following command:
+## 🚀 Quickstart
 
-```shell
-npx hardhat test
-```
-
-You can also selectively run the Solidity or `mocha` tests:
-
-```shell
-npx hardhat test solidity
-npx hardhat test mocha
-```
-
-### Make a deployment to Sepolia
-
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
-
-To run the deployment to a local chain:
-
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
-
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
-
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
-
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
-
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
-
-After setting the variable, you can run the deployment with the Sepolia network:
-
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
-# vwr-demo
+Clone the repo:
+```bash
+git clone https://github.com/YOURNAME/vwr-demo.git
+cd vwr-demo
