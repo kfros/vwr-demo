@@ -32,5 +32,5 @@
 
 Clone the repo:
 ```bash
-git clone https://github.com/YOURNAME/vwr-demo.git
+git clone https://github.com/kfros/vwr-demo.git
 cd vwr-demo
