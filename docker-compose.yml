@@ -1,41 +1,91 @@
 version: "3.9"
 
-
 services:
-    pg:
-        image: postgres:16
-        restart: unless-stopped
-        environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: a247996346A!
-            POSTGRES_DB: vwr
-            LANG: en_US.utf8
-            LC_ALL: en_US.utf8
-        ports:
-        - "5433:5432"
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U postgres"]
-            interval: 5s
-            timeout: 5s
-            retries: 20
-        volumes:
-        - pgdata:/var/lib/postgresql/data
-        - ./initdb:/docker-entrypoint-initdb.d:ro
+  db:
+    image: postgres:16
+    container_name: vwr-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
+  hardhat:
+    image: node:22-alpine
+    container_name: vwr-hardhat
+    working_dir: /app
+    command: sh -c "npm ci && npx hardhat node --hostname 0.0.0.0"
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app
 
-    redis:
-        image: redis:7
-        restart: unless-stopped
-        ports:
-        - "6379:6379"
+  deploy:
+    image: node:22-alpine
+    container_name: vwr-deploy
+    depends_on:
+      hardhat:
+        condition: service_started
+    working_dir: /app
+    # Wait until hardhat RPC answers, then deploy, print address, stay alive (so logs persist)
+    command: >
+      sh -c "
+      npm ci &&
+      for i in $(seq 1 50); do
+        node -e \"fetch('http://hardhat:8545',{method:'POST',headers:{'Content-Type':'application/json'},body:'{\"jsonrpc\":\"2.0\",\"method\":\"web3_clientVersion\",\"params\":[],\"id\":1}'}).then(()=>process.exit(0)).catch(()=>process.exit(1));\" && break || sleep 1;
+      done &&
+      npx hardhat compile &&
+      ADDR=$(npx hardhat run scripts/deploy.ts --network localhost | awk '/deployed to:/ {print $NF}') &&
+      echo \"\n✅ AttestationRegistry deployed to: $ADDR\n\" &&
+      tail -f /dev/null
+      "
+    volumes:
+      - ./contracts:/app
 
+  api:
+    build:
+      context: ./backend/Vwr.Api
+      dockerfile: Dockerfile
+    container_name: vwr-api
+    depends_on:
+      db:
+        condition: service_healthy
+      hardhat:
+        condition: service_started
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ConnectionStrings__pg: ${ConnectionStrings__pg}
+      EVM__RPCURL: ${EVM__RPCURL}
+      EVM__PRIVATEKEY: ${EVM__PRIVATEKEY}
+      # IMPORTANT: set EVM__CONTRACTADDRESS after deploy logs print it
+      EVM__CONTRACTADDRESS: ${EVM__CONTRACTADDRESS}
+      # Optional: configurable CORS list
+      CORS__AllowedOrigins: ${CORS__AllowedOrigins}
+    ports:
+      - "7020:8080" # host:https://localhost:7020 (if you proxy TLS) or http://localhost:7020
+    # If your code auto-migrates on startup, nothing else needed.
+    # Otherwise you could add a 'command' to run migrations here.
 
-    anvil:
-        image: ghcr.io/foundry-rs/foundry:latest
-        command: anvil -p 8545 --block-time 1
-        ports:
-        - "8545:8545"
-        restart: unless-stopped
+  web:
+    build:
+      context: ./vwr-app
+      dockerfile: Dockerfile
+    container_name: vwr-web
+    depends_on:
+      - api
+    environment:
+      # For Nginx-served SPA, API URL must point to host machine (Docker host = localhost)
+      VITE_API_URL: http://localhost:7020
+    ports:
+      - "8080:80"
 
 volumes:
-    pgdata:
+  pgdata:
